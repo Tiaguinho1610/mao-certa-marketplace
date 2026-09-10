@@ -7,6 +7,7 @@ import {
   Heart,
   MapPin,
   Menu,
+  Phone,
   Search,
   ShieldCheck,
   Sparkles,
@@ -27,6 +28,10 @@ type Professional = {
   initials: string
   color: string
   verified: boolean
+  experience: string
+  description: string
+  phone: string
+  availability: string
   featured?: boolean
 }
 
@@ -48,12 +53,14 @@ const categories = [
   { label: 'Limpeza', icon: '✧' },
 ]
 
+const serviceCities = ['Todas as cidades', 'Taquara', 'Parobé', 'Igrejinha']
+
 const professionals: Professional[] = [
   {
     id: 1,
     name: 'Rafael Nascimento',
     role: 'Eletricista residencial',
-    location: 'Vila Madalena, São Paulo',
+    location: 'Taquara, RS',
     rating: 4.9,
     reviews: 126,
     price: 'a partir de R$ 90',
@@ -61,13 +68,17 @@ const professionals: Professional[] = [
     initials: 'RN',
     color: '#e4b85c',
     verified: true,
+    experience: '8 anos de experiência',
+    description: 'Instalações elétricas residenciais, manutenção, iluminação e adequação de quadros com segurança e acabamento cuidadoso.',
+    phone: '(51) 99912-3456',
+    availability: 'Atende hoje',
     featured: true,
   },
   {
     id: 2,
     name: 'João Lucas',
     role: 'Pedreiro e reformas',
-    location: 'Mooca, São Paulo',
+    location: 'Parobé, RS',
     rating: 5.0,
     reviews: 84,
     price: 'a partir de R$ 150',
@@ -75,12 +86,16 @@ const professionals: Professional[] = [
     initials: 'JL',
     color: '#b7c6a5',
     verified: true,
+    experience: '12 anos de experiência',
+    description: 'Reformas completas, alvenaria, pisos e acabamentos para transformar sua casa com planejamento e qualidade.',
+    phone: '(51) 99876-2109',
+    availability: 'Agenda nesta semana',
   },
   {
     id: 3,
     name: 'Mariana Alves',
     role: 'Pintora de interiores',
-    location: 'Pinheiros, São Paulo',
+    location: 'Igrejinha, RS',
     rating: 4.8,
     reviews: 61,
     price: 'a partir de R$ 120',
@@ -88,12 +103,16 @@ const professionals: Professional[] = [
     initials: 'MA',
     color: '#d5a497',
     verified: true,
+    experience: '6 anos de experiência',
+    description: 'Pintura interna e externa, preparação de paredes e escolha de cores para ambientes residenciais e comerciais.',
+    phone: '(51) 99145-7820',
+    availability: 'Atende hoje',
   },
   {
     id: 4,
     name: 'Carlos Henrique',
     role: 'Encanador',
-    location: 'Saúde, São Paulo',
+    location: 'Taquara, RS',
     rating: 4.9,
     reviews: 108,
     price: 'a partir de R$ 80',
@@ -101,12 +120,16 @@ const professionals: Professional[] = [
     initials: 'CH',
     color: '#97b8c2',
     verified: true,
+    experience: '10 anos de experiência',
+    description: 'Consertos hidráulicos, instalação de torneiras, chuveiros, caixas d\'água e prevenção de vazamentos.',
+    phone: '(51) 99731-4802',
+    availability: 'Agenda nesta semana',
   },
   {
     id: 5,
     name: 'Ana Paula Souza',
     role: 'Limpeza e organização',
-    location: 'Aclimação, São Paulo',
+    location: 'Igrejinha, RS',
     rating: 4.9,
     reviews: 73,
     price: 'a partir de R$ 100',
@@ -114,13 +137,29 @@ const professionals: Professional[] = [
     initials: 'AS',
     color: '#d9bc71',
     verified: true,
+    experience: '5 anos de experiência',
+    description: 'Limpeza residencial detalhada e organização de ambientes para deixar sua rotina mais leve.',
+    phone: '(51) 99602-1188',
+    availability: 'Atende amanhã',
   },
 ]
+
+function ProfessionalProfile({ professional, onClose }: { professional: Professional; onClose: () => void }) {
+  return (
+    <div className="modal-backdrop" role="presentation" onClick={onClose}>
+      <div className="professional-profile" role="dialog" aria-modal="true" aria-labelledby="profile-title" onClick={(event) => event.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Fechar perfil"><X size={20} /></button>
+        <div className="profile-hero"><img src={professional.image} alt={`Foto de ${professional.name}`} /><div className="profile-avatar" style={{ backgroundColor: professional.color }}>{professional.initials}</div></div>
+        <div className="profile-body"><span className="overline">Profissional verificado</span><h2 id="profile-title">{professional.name}</h2><p className="profile-role">{professional.role}</p><div className="profile-meta"><span><MapPin size={15} /> {professional.location}</span><span><Star size={15} fill="currentColor" /> {professional.rating} ({professional.reviews} avaliações)</span></div><p className="profile-description">{professional.description}</p><div className="profile-facts"><span><strong>Experiência</strong>{professional.experience}</span><span><strong>Disponibilidade</strong>{professional.availability}</span><span><strong>Valor</strong>{professional.price}</span></div><a className="profile-contact" href={`tel:${professional.phone.replace(/\D/g, '')}`}><Phone size={17} /> Entrar em contato <ArrowRight size={16} /></a></div>
+      </div>
+    </div>
+  )
+}
 
 function App() {
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [searchTerm, setSearchTerm] = useState('')
-  const [location, setLocation] = useState('São Paulo, SP')
+  const [location, setLocation] = useState('Todas as cidades')
   const [favorites, setFavorites] = useState<number[]>([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSignupOpen, setIsSignupOpen] = useState(false)
@@ -134,6 +173,7 @@ function App() {
     description: '',
   })
   const [hasSearched, setHasSearched] = useState(false)
+  const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null)
 
   const openSignup = () => {
     setSignupSent(false)
@@ -154,9 +194,10 @@ function App() {
     return professionals.filter((professional) => {
       const matchesCategory = activeCategory === 'Todos' || professional.role.toLowerCase().includes(activeCategory.toLowerCase().replace('elétrica', 'eletricista').replace('hidráulica', 'encanador').replace('reformas', 'reforma'))
       const matchesSearch = !normalizedSearch || `${professional.name} ${professional.role} ${professional.location}`.toLowerCase().includes(normalizedSearch)
-      return matchesCategory && matchesSearch
+      const matchesLocation = location === 'Todas as cidades' || professional.location.startsWith(location)
+      return matchesCategory && matchesSearch && matchesLocation
     })
-  }, [activeCategory, searchTerm])
+  }, [activeCategory, location, searchTerm])
 
   const toggleFavorite = (id: number) => {
     setFavorites((current) => (current.includes(id) ? current.filter((favoriteId) => favoriteId !== id) : [...current, id]))
@@ -169,6 +210,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      {selectedProfessional && <ProfessionalProfile professional={selectedProfessional} onClose={() => setSelectedProfessional(null)} />}
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Mão Certa início">
           <span className="brand-mark"><span /></span>
@@ -206,7 +248,7 @@ function App() {
         <section className="search-panel" aria-label="Buscar profissionais">
           <div className="search-field search-service"><Search size={20} /><div><label>O que você precisa?</label><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Ex: instalar chuveiro" /></div></div>
           <div className="search-divider" />
-          <div className="search-field"><MapPin size={20} /><div><label>Onde?</label><input value={location} onChange={(event) => setLocation(event.target.value)} aria-label="Localização" /></div><ChevronDown size={17} /></div>
+          <label className="search-field location-select"><MapPin size={20} /><div><span>Onde?</span><select value={location} onChange={(event) => setLocation(event.target.value)} aria-label="Cidade de atendimento">{serviceCities.map((city) => <option key={city} value={city}>{city}{city !== 'Todas as cidades' ? ', RS' : ''}</option>)}</select></div><ChevronDown size={17} /></label>
           <button className="search-button" onClick={handleSearch}><Search size={18} /> Buscar agora</button>
         </section>
 
@@ -219,7 +261,7 @@ function App() {
           <div className="section-heading results-heading"><div><span className="overline">{hasSearched ? 'Resultados para você' : 'Perto de você'}</span><h2>Profissionais em destaque <span className="result-count">{visibleProfessionals.length}</span></h2></div><button className="filter-button"><span>Filtros</span><ChevronDown size={16} /></button></div>
           {visibleProfessionals.length > 0 ? <div className="professional-grid">{visibleProfessionals.map((professional) => <article className="professional-card" key={professional.id}>
             <div className="card-photo"><img src={professional.image} alt={`${professional.name}, ${professional.role}`} /><button className={`favorite-button ${favorites.includes(professional.id) ? 'is-favorite' : ''}`} onClick={() => toggleFavorite(professional.id)} aria-label={favorites.includes(professional.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}><Heart size={19} fill={favorites.includes(professional.id) ? 'currentColor' : 'none'} /></button>{professional.featured && <span className="featured-tag">Destaque</span>}</div>
-            <div className="card-content"><div className="professional-name"><div className="mini-avatar" style={{ backgroundColor: professional.color }}>{professional.initials}</div><div><h3>{professional.name}</h3><span>{professional.role}</span></div></div><div className="location-line"><MapPin size={14} /> {professional.location}</div><div className="card-footer"><span className="rating"><Star size={15} fill="currentColor" /> <strong>{professional.rating}</strong> <small>({professional.reviews})</small></span><span className="price">{professional.price}</span></div></div>
+            <div className="card-content"><div className="professional-name"><div className="mini-avatar" style={{ backgroundColor: professional.color }}>{professional.initials}</div><div><h3>{professional.name}</h3><span>{professional.role}</span></div></div><div className="location-line"><MapPin size={14} /> {professional.location}</div><div className="card-footer"><span className="rating"><Star size={15} fill="currentColor" /> <strong>{professional.rating}</strong> <small>({professional.reviews})</small></span><span className="price">{professional.price}</span></div><button className="profile-button" onClick={() => setSelectedProfessional(professional)}>Ver perfil <ArrowRight size={14} /></button></div>
           </article>)}</div> : <div className="empty-state"><span>⌁</span><h3>Nenhum profissional encontrado</h3><p>Tente outra busca ou escolha uma categoria diferente.</p><button onClick={() => { setSearchTerm(''); setActiveCategory('Todos') }}>Limpar busca</button></div>}
         </section>
 
