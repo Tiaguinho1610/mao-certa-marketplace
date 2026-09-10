@@ -1,0 +1,266 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Scaffold Vite React app",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"create-vite@latest",
+				".",
+				"--template",
+				"react-ts"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install project dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check Node installation",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$commands = @('node','npm','npx'); foreach ($command in $commands) { $found = Get-Command $command -ErrorAction SilentlyContinue; if ($found) { Write-Output ($command + ': ' + $found.Source) } else { Write-Output ($command + ': NOT FOUND') } }"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Locate Node executable",
+			"type": "shell",
+			"command": "where.exe",
+			"args": [
+				"node"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check Windows package manager",
+			"type": "shell",
+			"command": "where.exe",
+			"args": [
+				"winget"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install Node.js LTS",
+			"type": "shell",
+			"command": "winget",
+			"args": [
+				"install",
+				"--id",
+				"OpenJS.NodeJS.LTS",
+				"--exact",
+				"--accept-source-agreements",
+				"--accept-package-agreements"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install npm dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install npm dependencies",
+			"type": "shell",
+			"command": "C:\\Program Files\\nodejs\\npm.cmd",
+			"args": [
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install dependencies after Node setup",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/c",
+				"\"C:\\Program Files\\nodejs\\npm.cmd\" install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install dependencies by Node path",
+			"type": "shell",
+			"command": "C:\\Program Files\\nodejs\\node.exe",
+			"args": [
+				"C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build marketplace app",
+			"type": "shell",
+			"command": "C:\\Program Files\\nodejs\\node.exe",
+			"args": [
+				"C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build with refreshed Node PATH",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$env:Path = 'C:\\Program Files\\nodejs;' + $env:Path; & 'C:\\Program Files\\nodejs\\npm.cmd' run build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build with Node PATH fixed",
+			"type": "shell",
+			"command": "powershell.exe",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$env:Path = \"C:\\Program Files\\nodejs;\" + $env:Path; & \"C:\\Program Files\\nodejs\\npm.cmd\" run build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Build app using Node executable",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\npm.cmd",
+			"args": [
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Typecheck with direct Node",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\typescript\\bin\\tsc",
+				"-b"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Install React type packages",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"C:\\PROGRA~1\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+				"install"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify TypeScript after dependency fix",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\typescript\\bin\\tsc",
+				"-b"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify TypeScript clean build",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\typescript\\bin\\tsc",
+				"-b"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify Vite production build",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\vite\\bin\\vite.js",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start mão certa development server",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\vite\\bin\\vite.js",
+				"--host",
+				"127.0.0.1"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start mobile preview server",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\vite\\bin\\vite.js",
+				"--host",
+				"0.0.0.0"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check computer network address",
+			"type": "shell",
+			"command": "ipconfig",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Restart mobile Vite server",
+			"type": "shell",
+			"command": "C:\\PROGRA~1\\nodejs\\node.exe",
+			"args": [
+				"node_modules\\vite\\bin\\vite.js",
+				"--host",
+				"0.0.0.0",
+				"--port",
+				"5173"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}
