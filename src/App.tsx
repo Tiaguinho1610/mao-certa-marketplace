@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import {
   ArrowRight,
   Check,
@@ -27,6 +28,15 @@ type Professional = {
   color: string
   verified: boolean
   featured?: boolean
+}
+
+type ProviderSignup = {
+  name: string
+  email: string
+  phone: string
+  category: string
+  city: string
+  description: string
 }
 
 const categories = [
@@ -114,7 +124,30 @@ function App() {
   const [favorites, setFavorites] = useState<number[]>([])
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSignupOpen, setIsSignupOpen] = useState(false)
+  const [signupSent, setSignupSent] = useState(false)
+  const [signupData, setSignupData] = useState<ProviderSignup>({
+    name: '',
+    email: '',
+    phone: '',
+    category: '',
+    city: '',
+    description: '',
+  })
   const [hasSearched, setHasSearched] = useState(false)
+
+  const openSignup = () => {
+    setSignupSent(false)
+    setIsSignupOpen(true)
+  }
+
+  const updateSignup = (field: keyof ProviderSignup, value: string) => {
+    setSignupData((current) => ({ ...current, [field]: value }))
+  }
+
+  const handleSignup = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSignupSent(true)
+  }
 
   const visibleProfessionals = useMemo(() => {
     const normalizedSearch = searchTerm.toLowerCase().trim()
@@ -144,7 +177,7 @@ function App() {
         <nav className={`main-nav ${isMenuOpen ? 'is-open' : ''}`}>
           <a href="#como-funciona" onClick={() => setIsMenuOpen(false)}>Como funciona</a>
           <a href="#profissionais" onClick={() => setIsMenuOpen(false)}>Encontrar profissional</a>
-          <button className="nav-provider" onClick={() => setIsSignupOpen(true)}>Quero oferecer meu serviço <ArrowRight size={16} /></button>
+          <button className="nav-provider" onClick={openSignup}>Quero oferecer meu serviço <ArrowRight size={16} /></button>
         </nav>
         <button className="menu-toggle" aria-label="Abrir menu" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X size={23} /> : <Menu size={23} />}
@@ -193,9 +226,9 @@ function App() {
         <section className="trust-section" id="como-funciona"><div className="trust-visual"><div className="trust-line" /><div className="trust-stat"><strong>4.9</strong><span><Star size={15} fill="currentColor" /> média de avaliação</span></div></div><div className="trust-copy"><span className="overline">Por que a mão certa?</span><h2>Menos procura.<br /><em>Mais certeza.</em></h2><p>A gente cuida dos detalhes para você contratar sem medo. Cada profissional passa por uma análise de perfil e é avaliado por quem já contratou.</p><div className="trust-points"><span><Check size={16} /> Perfis verificados</span><span><Check size={16} /> Avaliações reais</span><span><Check size={16} /> Orçamento sem compromisso</span></div></div></section>
       </main>
 
-      <footer className="site-footer"><div className="footer-brand"><a className="brand" href="#top"><span className="brand-mark"><span /></span><span>mão <strong>certa</strong></span></a><p>Serviços que resolvem.<br />Do seu jeito.</p></div><div className="footer-links"><a href="#como-funciona">Sobre a mão certa</a><a href="#profissionais">Para clientes</a><button onClick={() => setIsSignupOpen(true)}>Para profissionais</button></div><span className="copyright">© 2024 mão certa</span></footer>
+      <footer className="site-footer"><div className="footer-brand"><a className="brand" href="#top"><span className="brand-mark"><span /></span><span>mão <strong>certa</strong></span></a><p>Serviços que resolvem.<br />Do seu jeito.</p></div><div className="footer-links"><a href="#como-funciona">Sobre a mão certa</a><a href="#profissionais">Para clientes</a><button onClick={openSignup}>Para profissionais</button></div><span className="copyright">© 2024 mão certa</span></footer>
 
-      {isSignupOpen && <div className="modal-backdrop" role="presentation" onClick={() => setIsSignupOpen(false)}><div className="signup-modal" role="dialog" aria-modal="true" aria-labelledby="signup-title" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setIsSignupOpen(false)} aria-label="Fechar"><X size={20} /></button><span className="modal-icon"><Users size={21} /></span><span className="overline">Faça parte da nossa rede</span><h2 id="signup-title">Seu talento merece<br /><em>ser encontrado.</em></h2><p>Cadastre seus serviços e conecte-se com pessoas que precisam do que você faz de melhor.</p><form onSubmit={(event) => { event.preventDefault(); setIsSignupOpen(false) }}><input required placeholder="Seu nome completo" /><input required type="email" placeholder="Seu melhor e-mail" /><button className="primary-button" type="submit">Começar cadastro <ArrowRight size={17} /></button></form></div></div>}
+      {isSignupOpen && <div className="modal-backdrop" role="presentation" onClick={() => setIsSignupOpen(false)}><div className="signup-modal" role="dialog" aria-modal="true" aria-labelledby="signup-title" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setIsSignupOpen(false)} aria-label="Fechar"><X size={20} /></button><span className="modal-icon"><Users size={21} /></span>{signupSent ? <div className="signup-success"><span className="success-icon"><Check size={23} /></span><span className="overline">Cadastro recebido</span><h2 id="signup-title">Obrigado, {signupData.name.split(' ')[0] || 'profissional'}.</h2><p>Seu perfil foi enviado para análise. Em breve entraremos em contato pelo e-mail informado.</p><button className="primary-button" onClick={() => setIsSignupOpen(false)}>Fechar cadastro <Check size={17} /></button></div> : <><span className="overline">Faça parte da nossa rede</span><h2 id="signup-title">Seu talento merece<br /><em>ser encontrado.</em></h2><p>Conte um pouco sobre o seu trabalho para encontrarmos clientes que precisam de você.</p><form onSubmit={handleSignup}><div className="signup-fields"><label>Nome completo<input required value={signupData.name} onChange={(event) => updateSignup('name', event.target.value)} placeholder="Ex: João da Silva" /></label><label>E-mail<input required type="email" value={signupData.email} onChange={(event) => updateSignup('email', event.target.value)} placeholder="voce@email.com" /></label><label>WhatsApp<input required type="tel" value={signupData.phone} onChange={(event) => updateSignup('phone', event.target.value)} placeholder="(11) 99999-9999" /></label><label>Serviço principal<select required value={signupData.category} onChange={(event) => updateSignup('category', event.target.value)}><option value="">Selecione uma categoria</option>{categories.slice(1).map((category) => <option key={category.label} value={category.label}>{category.label}</option>)}</select></label><label className="signup-wide">Cidade e estado<input required value={signupData.city} onChange={(event) => updateSignup('city', event.target.value)} placeholder="Ex: São Paulo, SP" /></label><label className="signup-wide">Sobre o seu trabalho<textarea required minLength={20} value={signupData.description} onChange={(event) => updateSignup('description', event.target.value)} placeholder="Descreva sua experiência e os serviços que oferece" rows={4} /></label></div><button className="primary-button" type="submit">Enviar meu cadastro <ArrowRight size={17} /></button></form></>}</div></div>}
     </div>
   )
 }
