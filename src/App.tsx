@@ -7,7 +7,7 @@ import {
   Heart,
   MapPin,
   Menu,
-  Phone,
+  MessageCircle,
   Search,
   ShieldCheck,
   Sparkles,
@@ -150,7 +150,7 @@ function ProfessionalProfile({ professional, onClose }: { professional: Professi
       <div className="professional-profile" role="dialog" aria-modal="true" aria-labelledby="profile-title" onClick={(event) => event.stopPropagation()}>
         <button className="modal-close" onClick={onClose} aria-label="Fechar perfil"><X size={20} /></button>
         <div className="profile-hero"><img src={professional.image} alt={`Foto de ${professional.name}`} /><div className="profile-avatar" style={{ backgroundColor: professional.color }}>{professional.initials}</div></div>
-        <div className="profile-body"><span className="overline">Profissional verificado</span><h2 id="profile-title">{professional.name}</h2><p className="profile-role">{professional.role}</p><div className="profile-meta"><span><MapPin size={15} /> {professional.location}</span><span><Star size={15} fill="currentColor" /> {professional.rating} ({professional.reviews} avaliações)</span></div><p className="profile-description">{professional.description}</p><div className="profile-facts"><span><strong>Experiência</strong>{professional.experience}</span><span><strong>Disponibilidade</strong>{professional.availability}</span><span><strong>Valor</strong>{professional.price}</span></div><a className="profile-contact" href={`tel:${professional.phone.replace(/\D/g, '')}`}><Phone size={17} /> Entrar em contato <ArrowRight size={16} /></a></div>
+        <div className="profile-body"><span className="overline">Profissional verificado</span><h2 id="profile-title">{professional.name}</h2><p className="profile-role">{professional.role}</p><div className="profile-meta"><span><MapPin size={15} /> {professional.location}</span><span><Star size={15} fill="currentColor" /> {professional.rating} ({professional.reviews} avaliações)</span></div><p className="profile-description">{professional.description}</p><div className="profile-facts"><span><strong>Experiência</strong>{professional.experience}</span><span><strong>Disponibilidade</strong>{professional.availability}</span><span><strong>Valor</strong>{professional.price}</span></div><a className="profile-contact" href={`https://wa.me/55${professional.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Falar pelo WhatsApp <ArrowRight size={16} /></a></div>
       </div>
     </div>
   )
