@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import {
   ArrowRight,
@@ -15,6 +15,7 @@ import {
   Users,
   X,
 } from 'lucide-react'
+import { supabase } from './lib/supabase'
 
 type Professional = {
   id: number
@@ -44,6 +45,12 @@ type ProviderSignup = {
   description: string
 }
 
+type ProfessionalRow = Professional & {
+  email: string
+  category: string
+  city: string
+}
+
 const categories = [
   { label: 'Todos', icon: '✦' },
   { label: 'Elétrica', icon: '⚡' },
@@ -55,7 +62,7 @@ const categories = [
 
 const serviceCities = ['Todas as cidades', 'Taquara', 'Parobé', 'Igrejinha']
 
-const professionals: Professional[] = [
+const initialProfessionals: Professional[] = [
   {
     id: 1,
     name: 'Rafael Nascimento',
@@ -144,6 +151,25 @@ const professionals: Professional[] = [
   },
 ]
 
+const mapProfessionalRow = (professional: ProfessionalRow): Professional => ({
+  id: professional.id,
+  name: professional.name,
+  role: professional.role,
+  location: professional.city.endsWith(', RS') ? professional.city : `${professional.city}, RS`,
+  rating: professional.rating,
+  reviews: professional.reviews,
+  price: professional.price,
+  image: professional.image,
+  initials: professional.initials,
+  color: professional.color,
+  verified: professional.verified,
+  experience: professional.experience,
+  description: professional.description,
+  phone: professional.phone,
+  availability: professional.availability,
+  featured: professional.featured,
+})
+
 function ProfessionalProfile({ professional, onClose }: { professional: Professional; onClose: () => void }) {
   return (
     <div className="modal-backdrop" role="presentation" onClick={onClose}>
@@ -157,6 +183,7 @@ function ProfessionalProfile({ professional, onClose }: { professional: Professi
 }
 
 function App() {
+  const [professionals, setProfessionals] = useState<Professional[]>(initialProfessionals)
   const [activeCategory, setActiveCategory] = useState('Todos')
   const [searchTerm, setSearchTerm] = useState('')
   const [location, setLocation] = useState('Todas as cidades')
@@ -175,6 +202,20 @@ function App() {
   const [hasSearched, setHasSearched] = useState(false)
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null)
 
+  useEffect(() => {
+    if (!supabase) return
+    const client = supabase
+
+    const loadProfessionals = async () => {
+      const { data, error } = await client.from('professionals').select('*').order('created_at', { ascending: false })
+      if (!error && data?.length) {
+        setProfessionals(data.map((professional) => mapProfessionalRow(professional as ProfessionalRow)))
+      }
+    }
+
+    void loadProfessionals()
+  }, [])
+
   const openSignup = () => {
     setSignupSent(false)
     setIsSignupOpen(true)
@@ -184,8 +225,67 @@ function App() {
     setSignupData((current) => ({ ...current, [field]: value }))
   }
 
-  const handleSignup = (event: FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const nameParts = signupData.name.trim().split(/\s+/)
+    const initials = nameParts.slice(0, 2).map((part) => part[0]).join('').toUpperCase()
+    const categoryRoles: Record<string, string> = {
+      Elétrica: 'Eletricista residencial',
+      Hidráulica: 'Encanador',
+      Reformas: 'Profissional de reformas',
+      Pintura: 'Pintor(a) de interiores',
+      Limpeza: 'Limpeza e organização',
+    }
+
+    const newProfessional: Professional = {
+      id: Date.now(),
+      name: signupData.name.trim(),
+      role: categoryRoles[signupData.category] ?? signupData.category,
+      location: `${signupData.city}, RS`,
+      rating: 0,
+      reviews: 0,
+      price: 'Consulte o profissional',
+      image: 'https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=900&q=85',
+      initials: initials || 'NP',
+      color: '#d9bc71',
+      verified: true,
+      experience: 'Novo na mão certa',
+      description: signupData.description,
+      phone: signupData.phone,
+      availability: 'Disponível para contato',
+    }
+
+    if (supabase) {
+      const { data, error } = await supabase.from('professionals').insert({
+        name: newProfessional.name,
+        email: signupData.email,
+        phone: newProfessional.phone,
+        category: signupData.category,
+        role: newProfessional.role,
+        city: signupData.city,
+        description: newProfessional.description,
+        image: newProfessional.image,
+        initials: newProfessional.initials,
+        color: newProfessional.color,
+        rating: newProfessional.rating,
+        reviews: newProfessional.reviews,
+        price: newProfessional.price,
+        experience: newProfessional.experience,
+        availability: newProfessional.availability,
+        verified: newProfessional.verified,
+        featured: false,
+      }).select().single()
+
+      if (!error && data) {
+        setProfessionals((current) => [mapProfessionalRow(data as ProfessionalRow), ...current])
+      } else {
+        setProfessionals((current) => [newProfessional, ...current])
+      }
+    } else {
+      setProfessionals((current) => [newProfessional, ...current])
+    }
+    setActiveCategory('Todos')
+    setLocation('Todas as cidades')
     setSignupSent(true)
   }
 
